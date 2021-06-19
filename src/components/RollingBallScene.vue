@@ -25,6 +25,8 @@ export default {
   mounted() {
     ////// INITIALIZATION
     this.sceneCanvas = this.$refs.scene;
+    console.log(this.sceneCanvas.clientWidth);
+    console.log(11);
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -35,9 +37,29 @@ export default {
     );
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.sceneCanvas.appendChild(this.renderer.domElement);
 
     /////// CONFIGURING INIT SETTINGS
+    this.renderer.setSize(
+      this.sceneCanvas.clientWidth,
+      this.sceneCanvas.clientHeight
+    );
+
+    this.renderer.setClearColor("#00000f");
+
+    this.sceneCanvas.appendChild(this.renderer.domElement);
+
+    this.camera.position.z = 20;
+
+    ////////// ADD MESH
+    var geometry = new THREE.SphereGeometry(5, 32, 32);
+	var material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+	var sphere = new THREE.Mesh(geometry, material);
+
+	this.scene.add(sphere);
+
+
+	////////// RENDER SCENE
+    this.renderer.render(this.scene, this.camera);
   },
 };
 </script>
@@ -53,16 +75,6 @@ h1 {
 }
 
 .scene {
-  display: inline;
-  align-content: center;
-  width: 100%;
-  height: 600px;
-}
-
-.scene canvas {
-  display: inline !important;
-  margin: auto;
-  width: 100%;
-  height: 100%;
+	height: 60vh;
 }
 </style>
