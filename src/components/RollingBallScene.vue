@@ -20,19 +20,30 @@ export default {
     };
   },
 
-  methods: {},
+  methods: {
+    animate(mesh) {
+      mesh.position.set(-400, -150, 0);
+      this.renderer.render(this.scene, this.camera);
+    },
+  },
 
   mounted() {
     ////// INITIALIZATION
     this.sceneCanvas = this.$refs.scene;
-    console.log(this.sceneCanvas.clientWidth);
-    console.log(11);
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      this.sceneCanvas.clientWidth / this.sceneCanvas.clientHeight,
-      0.1,
+    // this.camera = new THREE.PerspectiveCamera(
+    //   75,
+    //   this.sceneCanvas.clientWidth / this.sceneCanvas.clientHeight,
+    //   0.1,
+    //   1000
+    // );
+    this.camera = new THREE.OrthographicCamera(
+      this.sceneCanvas.clientWidth / -2,
+      this.sceneCanvas.clientWidth / 2,
+      this.sceneCanvas.clientHeight / -2,
+      this.sceneCanvas.clientHeight / 2,
+      1,
       1000
     );
 
@@ -48,18 +59,21 @@ export default {
 
     this.sceneCanvas.appendChild(this.renderer.domElement);
 
-    this.camera.position.z = 20;
+    // this.camera.position.z = 5;
 
     ////////// ADD MESH
-    var geometry = new THREE.SphereGeometry(5, 32, 32);
-	var material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-	var sphere = new THREE.Mesh(geometry, material);
+    var geometry = new THREE.SphereGeometry(50, 32, 32);
+    var material = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      wireframe: true,
+    });
+    var sphere = new THREE.Mesh(geometry, material);
+    sphere.position.x = -20;
 
-	this.scene.add(sphere);
+    this.scene.add(sphere);
 
-
-	////////// RENDER SCENE
-    this.renderer.render(this.scene, this.camera);
+    ////////// RENDER SCENE
+    this.animate(sphere);
   },
 };
 </script>
@@ -75,6 +89,6 @@ h1 {
 }
 
 .scene {
-	height: 60vh;
+  height: 60vh;
 }
 </style>
