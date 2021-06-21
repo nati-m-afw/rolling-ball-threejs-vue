@@ -2,6 +2,7 @@
   <div>
     <h1>Rolling Ball</h1>
     <div class="scene" ref="scene" @click="moveBall"></div>
+    <pre>{{ $data }}</pre>
   </div>
 </template>
 
@@ -13,6 +14,12 @@ export default {
 
   data() {
     return {
+      ballX: -400,
+      ballY: -150,
+      eventLocation: null,
+      slope: null,
+      yInt: null,
+      speed: null,
       sceneCanvas: null,
       scene: null,
       camera: null,
@@ -20,54 +27,62 @@ export default {
       mesh: {
         sphere: null,
       },
-
-      eventLocation: null,
-      speed: 20,
     };
   },
 
   methods: {
     animate() {
       let animId = requestAnimationFrame(this.animate);
-      let [meshType, x, y] = this.eventLocation;
+      let [meshType, x] = this.eventLocation;
 
-      if (
-        this.mesh[meshType].position.x == x &&
-        this.mesh[meshType].position.y == y
-      ) {
-        console.log(this.mesh[meshType].position.x);
-        this.speed = 20;
+      if (this.mesh[meshType].position.x == x) {
+        // this.speed = 20;
         cancelAnimationFrame(animId);
       }
-      if (x > this.mesh[meshType].position.x)
-        this.mesh[meshType].position.x += this.speed;
-      else if (x < this.mesh[meshType].position.x)
-        this.mesh[meshType].position.x -= this.speed;
-      if (y > this.mesh[meshType].position.y)
-        this.mesh[meshType].position.y += this.speed;
-      else if (y < this.mesh[meshType].position.y)
-        this.mesh[meshType].position.y -= this.speed;
 
-      if (this.speed > 1.0) this.speed -= 0.5;
+      // Speed with acceleration
+      // console.log(x - this.ballX);
+      // // Distance between ballX and x of click postion
+      // let distance = (x - this.ballX) / 100;
+      // if (distance > 1) this.speed = distance ** 2;
+      // else if (distance < -1) this.speed = -(distance ** 2);
+      // else if (0 <= distance && distance <= 1) this.speed = 1;
+      // else this.speed = -1;
+      // console.log("Distance->", distance, "Speed->", this.speed);
+      // this.ballX += parseInt(this.speed);
+      // Static Speed
+      this.ballX += x - this.ballX > 0 ? x - this.ballX > 10 ? 10 : 1 : x - this.ballX < -10 ? -10 : -1;
+      this.ballY = this.slope * this.ballX + this.yInt;
+      this.mesh[meshType].position.set(this.ballX, this.ballY, 0);
 
       this.renderer.render(this.scene, this.camera);
     },
 
     moveBall(e) {
-      console.log(
-        "X->" +
-          (e.offsetX - this.sceneCanvas.offsetWidth / 2) +
-          "/" +
-          this.sceneCanvas.offsetWidth,
-        "Y->" +
-          (e.offsetY - this.sceneCanvas.offsetHeight / 2) +
-          "/" +
-          this.sceneCanvas.offsetHeight
-      );
+      // console.log(
+      //   "X->" +
+      //     (e.offsetX - this.sceneCanvas.offsetWidth / 2) +
+      //     "/" +
+      //     this.sceneCanvas.offsetWidth,
+      //   "Y->" +
+      //     (e.offsetY - this.sceneCanvas.offsetHeight / 2) +
+      //     "/" +
+      //     this.sceneCanvas.offsetHeight
+      // );
       let x = parseInt(e.offsetX - this.sceneCanvas.offsetWidth / 2);
       let y = parseInt(e.offsetY - this.sceneCanvas.offsetHeight / 2);
       this.eventLocation = ["sphere", x, y];
-      this.animate(...this.eventLocation);
+      this.slope = this.getSlope(this.ballX, x, this.ballY, y);
+      this.yInt = this.getYIntercept(this.ballX, x, this.ballY, y);
+      this.animate();
+    },
+
+    // Helper functions
+    getSlope(x0, x1, y0, y1) {
+      return (y1 - y0) / (x1 - x0);
+    },
+    getYIntercept(x0, x1, y0, y1) {
+      return y0 - this.getSlope(x0, x1, y0, y1) * x0;
     },
   },
 
@@ -116,7 +131,7 @@ export default {
     this.scene.add(this.mesh.sphere);
 
     ////////// RENDER SCENE
-    this.mesh.sphere.position.set(-400, -150, 0);
+    this.mesh.sphere.position.set(this.ballX, this.ballY, 0);
     this.renderer.render(this.scene, this.camera);
   },
 };
