@@ -51,6 +51,7 @@ export default {
       // console.log("Distance->", distance, "Speed->", this.speed);
       // this.ballX += parseInt(this.speed);
       // Static Speed
+      //eslint-disable-next-line
       this.ballX += x - this.ballX > 0 ? x - this.ballX > 10 ? 10 : 1 : x - this.ballX < -10 ? -10 : -1;
       this.ballY = this.slope * this.ballX + this.yInt;
       this.mesh[meshType].position.set(this.ballX, this.ballY, 0);
@@ -122,13 +123,24 @@ export default {
 
     ////////// ADD MESH
     var geometry = new THREE.SphereGeometry(50, 32, 32);
-    var material = new THREE.MeshBasicMaterial({
+    var material = new THREE.MeshStandardMaterial({
       color: 0xffffff,
-      wireframe: true,
+      // wireframe: true,
+      emissive: 0x00ff00,
+      emissiveIntensity: 0.2,
+      // map: new THREE.TextureLoader().load(require("../assets/img/ball_texture.jpg")),
+      roughness: 0.5,
+      metalness: 0.1,
     });
     this.mesh.sphere = new THREE.Mesh(geometry, material);
 
     this.scene.add(this.mesh.sphere);
+
+    /////////// ADD LIGHT
+    const light = new THREE.AmbientLight(0xffff00, 0.5);
+    this.scene.add(light);
+    const light2 = new THREE.PointLight(0xffff00, 0.5);
+    this.scene.add(light2);
 
     ////////// RENDER SCENE
     this.mesh.sphere.position.set(this.ballX, this.ballY, 0);
