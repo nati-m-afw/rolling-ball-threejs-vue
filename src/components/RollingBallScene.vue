@@ -115,7 +115,7 @@ export default {
       this.sceneCanvas.clientHeight
     );
 
-    this.renderer.setClearColor("#00000f");
+    this.renderer.setClearColor("#f5f5f5");
 
     this.sceneCanvas.appendChild(this.renderer.domElement);
 
@@ -137,9 +137,18 @@ export default {
     this.scene.add(this.mesh.sphere);
 
     /////////// ADD LIGHT
-    const light = new THREE.AmbientLight(0xffff00, 0.5);
-    this.scene.add(light);
+    // const light = new THREE.AmbientLight(0xffff00, 0.5);
+    // this.scene.add(light);
+
+    var sphere = new THREE.SphereGeometry(8, 16, 8);
     const light2 = new THREE.PointLight(0xffff00, 0.5);
+    light2.add(
+      new THREE.Mesh(
+        sphere,
+        new THREE.MeshBasicMaterial({ color: 0xffff00, decay: 2 })
+      )
+    );
+    light2.position.z = -200;
     this.scene.add(light2);
 
     ////////// RENDER SCENE
